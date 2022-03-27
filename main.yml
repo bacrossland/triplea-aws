@@ -1,0 +1,36 @@
+- name: Provision Bot
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: Provision an EC2 instance with a public IP address
+      amazon.aws.ec2_instance:
+        name: TripleA Bot
+        aws_profile: default
+        key_name: triplea
+        vpc_subnet_id: subnet-b25c3afe
+        instance_type: t2.micro
+        security_group: TripleA
+        network:
+          assign_public_ip: true
+        image_id: ami-0fb653ca2d3203ac1
+        region: us-east-2
+      register: result
+
+    - name: Add all instance public IPs to host group
+      add_host: hostname={{ item.public_ip_address }} groups=ec2hosts
+      loop: "{{ result.instances }}"
+
+- hosts: ec2hosts
+  name: configuration play
+  become: yes
+  user: ubuntu
+  gather_facts: true
+  vars:
+    ansible_ssh_private_key_file: "~/.ssh/triplea.pem"
+  roles:
+    - system/apt_update
+    - system/apt_common_tools
+    - system/journald
+    - java
+
+
