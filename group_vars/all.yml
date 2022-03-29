@@ -1,0 +1,4 @@
+admin_user: ubuntu
+admin_home: "/home/{{ admin_user }}"
+private_game_password: ""
+version: 2.5.0

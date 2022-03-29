@@ -1,0 +1,102 @@
+- name: create service user to run the app
+  user:
+    name: "{{ bot_user }}"
+    create_home: yes
+    system: yes
+
+- name: deploy scripts to admin home
+  tags: [deploy]
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ admin_home }}/{{ item }}"
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: "0755"
+  with_items:
+    - start-all
+    - stop-all
+    - download-all-maps
+
+- name: create maps folder
+  file:
+    state: directory
+    path: "{{ item }}"
+    mode: "0755"
+    owner: "{{ bot_user }}"
+    group: "{{ bot_user }}"
+  with_items:
+    - "{{ bot_install_home }}"
+    - "{{ bot_maps_folder }}"
+
+- name: download maps on bot server
+  tags: [update_maps]
+  command: "{{ admin_home }}/download-all-maps"
+
+#- name: deploy zip file (prerelease build only)
+#  tags: [prerelease, deploy]
+#  copy:
+#    src: "triplea-game-headless-{{ bot_version }}.zip"
+#    dest: "{{ bot_install_home }}/triplea-game-headless-{{ bot_version }}.zip"
+#    owner: "{{ bot_user }}"
+#    group: "{{ bot_user }}"
+
+
+- name: download zip file (release build only)
+  tags: [release, deploy]
+  get_url:
+    url: "{{ zip_download }}"
+    dest: "{{ bot_install_home }}/triplea-game-headless-{{ bot_version }}.zip"
+    owner: "{{ bot_user }}"
+    group: "{{ bot_user }}"
+
+- name: extract zip file
+  tags: [deploy]
+  unarchive:
+    remote_src: yes
+    src: "{{ bot_install_home }}/triplea-game-headless-{{ bot_version }}.zip"
+    dest: "{{ bot_install_home }}/"
+    owner: "{{ bot_user }}"
+    group: "{{ bot_user }}"
+
+- name: create triplea-root touch file
+  file:
+    state: touch
+    path: "{{ bot_install_home }}/.triplea-root"
+    mode: "0644"
+    owner: "{{ bot_user }}"
+    group: "{{ bot_user }}"
+
+- name: deploy run_bot script
+  tags: [deploy]
+  template:
+    src: run_bot.j2
+    dest: "{{ bot_install_home }}/run_bot"
+    mode: "755"
+    owner: "{{ bot_user }}"
+    group: "{{ bot_user }}"
+
+- name: install systemd service script
+  tags: [deploy]
+  template:
+    src: bot.service.j2
+    dest: /lib/systemd/system/triplea.service
+    mode: "644"
+
+- name: reload systemd
+  tags: [deploy]
+  systemd:
+    daemon_reload: yes
+
+#- name: restart bots (prerelease build only)
+#  tags: [prerelease]
+#  service:
+#    name: "bot@{{ item }}"
+#    state: restarted
+#    enabled: yes
+#  with_items: "{{ bot_numbers }}"
+
+- name: enable and ensure bot is started
+  service:
+    name: "triplea"
+    state: started
+    enabled: yes

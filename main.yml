@@ -23,7 +23,7 @@
 - hosts: ec2hosts
   name: configuration play
   become: yes
-  user: ubuntu
+  user: "{{ admin_user }}"
   gather_facts: true
   vars:
     ansible_ssh_private_key_file: "~/.ssh/triplea.pem"
@@ -32,5 +32,6 @@
     - system/apt_common_tools
     - system/journald
     - java
+    - bot
 
-
+# need a reboot step for the instance after system updates. Separate role?

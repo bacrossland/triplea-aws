@@ -1,0 +1,45 @@
+bot_user: "bot"
+bot_folder: "/home/{{ bot_user }}"
+bot_version: "{{ version }}"
+
+# The location where we will install the bot binaries
+bot_install_home: "{{ bot_folder }}/{{ bot_version }}"
+
+# The location of the jar executable that we will run to launch the bot server.
+bot_jar: "{{ bot_install_home }}/bin/triplea-game-headless-{{ bot_version }}.jar"
+
+# A folder where the bot server will find maps.
+bot_maps_folder: "{{ bot_folder }}/maps"
+
+# The URI of the lobby that the bot would connect to.
+bot_lobby_uri: "{{ lobby_uri }}"
+
+bot_max_memory: "256M"
+
+# Each bot number matches a bot instance that will be deployed and started.
+bot_numbers: ["01", "02", "03", "04" ]
+
+# Bot prefix we expect to be overriden in inventory.
+# We deploy bots to multiple server, to keep the host numbers unique, there is a prefix.
+# The bot prefix should be unique across all bot hosts.
+# EG: with bot_prefix = 1, and bot_number=01, the bot number in the bot name will be '101'.
+bot_prefix: ""
+
+# Download URL the private server:
+zip_download: "https://github.com/bacrossland/triplea-docker/raw/private_server/triplea-game-headless-{{ bot_version }}.zip"
+
+# Name of the bot server, this will typically be overriden in inventory. The final name of the bot host is
+# concatenation of the "Bot" the "bot name", and the "bot number" with prefix.
+bot_name: "Server"
+
+# Arguments when running bot servers. Each of the key value pairs will be added as a '-p{key}={value}' argument
+# passed to the JVM when running the bot.
+bot_run_args:
+  triplea.port: "${BOT_PORT}"
+  triplea.name: "Bot{{ bot_prefix }}${BOT_NUMBER}_{{ bot_name }}"
+  triplea.lobby.uri: "{{ bot_lobby_uri }}"
+  triplea.map.folder: "{{ bot_maps_folder }}"
+
+# When set to true, all maps on the bot server will be updated (overwritten).
+update_maps: false
+
