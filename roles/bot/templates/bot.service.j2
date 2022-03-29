@@ -1,0 +1,13 @@
+[Unit]
+Description=TripleA Server
+Documentation=TripleA Server run by a bot.
+
+[Service]
+WorkingDirectory={{ bot_install_home }}
+User={{ bot_user }}
+Group={{ bot_user }}
+ExecStart={{ bot_install_home }}/run_bot -u MagicStyck -b MagicStyck_3300
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

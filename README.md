@@ -14,3 +14,22 @@ python 3.9+
 pip install -r requirements.txt
 ```
 
+### Run
+
+To setup a bot server for the first time.
+
+```shell
+ansible-playbook main.yml
+```
+
+To update the maps on a bot server.
+
+```shell
+ansible-playbook -t update_maps main.yml
+```
+
+To deploy a new release of TripleA onto the bot server.
+
+```shell
+ansible-playbook --skip-tags update_maps prerelease main.yml
+```
