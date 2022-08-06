@@ -8,11 +8,11 @@
         aws_profile: default
         key_name: triplea
         vpc_subnet_id: subnet-b25c3afe
-        instance_type: t2.micro
+        instance_type: t4g.micro
         security_group: TripleA
         network:
           assign_public_ip: true
-        image_id: ami-0fb653ca2d3203ac1
+        image_id: ami-0ff596d41505819fd
         region: us-east-2
       register: result
 
