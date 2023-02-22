@@ -2,7 +2,7 @@
 Ansible playbooks for TripleA servers on AWS
 
 VPC and subnet need to already be setup on AWS. So does the security group.
-Currently launches t4g.micro EC2 Ubuntu 22 instance (ami-0ff596d41505819fd).
+Currently launches t4g.micro EC2 Ubuntu 22 instance (ami-07ef7933c011a38e1).
 
 
 ### Requirements
