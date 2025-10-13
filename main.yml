@@ -10,9 +10,16 @@
         vpc_subnet_id: subnet-b25c3afe
         instance_type: t4g.micro
         security_group: TripleA
+        volumes:
+          - device_name: "/dev/sda1"
+            ebs:
+              volume_size: 15 # The size in GB
+              volume_type: "gp3"
+              delete_on_termination: true
+              iops: 3000
         network:
           assign_public_ip: true
-        image_id: ami-07ef7933c011a38e1
+        image_id: ami-05b580e994a808c42
         region: us-east-2
       register: result
 
@@ -20,18 +27,27 @@
       add_host: hostname={{ item.public_ip_address }} groups=ec2hosts
       loop: "{{ result.instances }}"
 
-- hosts: ec2hosts
-  name: configuration play
-  become: yes
-  user: "{{ admin_user }}"
-  gather_facts: true
-  vars:
-    ansible_ssh_private_key_file: "~/.ssh/triplea.pem"
-  roles:
-    - system/apt_update
-    - system/apt_common_tools
-    - system/journald
-    - java
-    - bot
+#- hosts: ec2hosts
+#  name: configuration play
+#  become: yes
+#  user: "{{ admin_user }}"
+#  gather_facts: true
+#  vars:
+#    ansible_ssh_private_key_file: "~/.ssh/triplea.pem"
+#  roles:
+#    - system/apt_update
+#    - system/apt_common_tools
+#    - system/journald
+#    - java
+
+#- hosts: ec2hosts
+#  name: install TripleA
+#  become: yes
+#  user: "{{ admin_user }}"
+#  gather_facts: true
+#  vars:
+#    ansible_ssh_private_key_file: "~/.ssh/triplea.pem"
+#  roles:
+#    - bot
 
 # need a reboot step for the instance after system updates. Separate role?
